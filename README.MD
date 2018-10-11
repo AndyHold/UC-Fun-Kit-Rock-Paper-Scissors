@@ -38,7 +38,7 @@ Attacking state:
         the attack co-ordinate.
 
     State two: When attack coordinate is chosen
-        State One: Validate
+        State One: Validate (ANDY)
             Check if co-ordinate has been used already, and reject if so.
 
             If rejected, display “You have already attacked there” and make error sound, return to
@@ -47,7 +47,7 @@ Attacking state:
             Else transmit the co-ordinate to the opponent and await response, (if wait is longer
             than 3 seconds re-transmit.)
 
-        State Two: display result
+        State Two: display result (REI)
             If hit-not sink display “Hit!!!” and make hit sound, this point will now be a solid light
             on the attack screen with full brightness.
 
