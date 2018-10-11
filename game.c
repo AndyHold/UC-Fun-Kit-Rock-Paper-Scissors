@@ -95,6 +95,6 @@ int main (void)
             display_character ( options[option] );
         }
 
-        /* compute winner etc here.
+        /* compute winner etc here. */
     }
 }
