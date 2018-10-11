@@ -2,6 +2,24 @@
 
 /* Module to display a scrolling text until navswitch pressed. */
 
+
+void display_instructions(char instructions[])
+{
+    /* Display Instructions for paper scissors rock */
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    tinygl_text(instructions);
+    displaytext_run();
+}
+
+void display_character (char character)
+{
+    char buffer[2];
+    buffer[0] = character;
+    buffer[1] = '\0';
+    tinygl_text (buffer);
+}
+
+
 int displaytext_run( void )
 {
     uint8_t finished = 0;
@@ -65,7 +83,7 @@ static void display_column (uint8_t row_pattern, uint8_t current_column)
 }
 
 
-void bitmap_display_run (uint8_t bitmap[5])
+void bitmap_display_run (const uint8_t bitmap[5])
 {
 
     uint8_t current_column = 0;

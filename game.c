@@ -12,53 +12,43 @@
 
 static const char options[3] =
 {
-    'P',
-    'S',
-    'R'
+    'P', 'S', 'R'
 };
 
 
-void display_instructions()
+static const uint8_t waiting_bitmap[5] =
 {
-    /* Display Instructions for paper scissors rock */
-    char instructions[20] = "Choose your option!\0";
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-    tinygl_text(instructions);
-    displaytext_run();
-}
+    0x32, 0x62, 0x6C, 0x62, 0x32
+};
 
-void display_character (char character)
-{
-    char buffer[2];
-    buffer[0] = character;
-    buffer[1] = '\0';
-    tinygl_text (buffer);
-}
 
 int main (void)
 {
 
     /* Initialise Everything  */
     initialize_all(PACER_RATE, MESSAGE_RATE);
-
-    /* Initialize pacer to run at 500hz */
-    display_instructions();
     int setupFinished = 0;
+    char your_selection = 0;
+    char opponents_selection = 0;
+    int option = 0;
+
+    /* Call instructions to be displayed */
+    display_instructions("Choose your option");
+
     tinygl_text_mode_set (TINYGL_TEXT_MODE_STEP);
 
     /* Start paper scissors rock loop */
     while(!setupFinished)
     {
-        int selectionMade = 0;
-        int opponentsSelection = 0;
-        int option = 0;
-
-        while(!selectionMade || !opponentsSelection)
+        while(!your_selection || !opponents_selection)
         {
+            /* Wait for the pacer to reach its target */
             pacer_wait ();
+            /* Update the tinygl and the navswitch */
             tinygl_update ();
             navswitch_update();
-            if ( navswitch_push_event_p ( NAVSWITCH_NORTH ) )
+            /* If navswitch north or west change to another option */
+            if ( navswitch_push_event_p ( NAVSWITCH_NORTH ) || navswitch_push_event_p ( NAVSWITCH_WEST ) )
             {
                 if (option == 2)
                 {
@@ -69,8 +59,8 @@ int main (void)
                     option++;
                 }
             }
-
-            if ( navswitch_push_event_p ( NAVSWITCH_SOUTH ) )
+            /* If navswitch north or east change to another option */
+            if ( navswitch_push_event_p ( NAVSWITCH_SOUTH ) || navswitch_push_event_p ( NAVSWITCH_EAST ) )
             {
                 if (option == 0)
                 {
@@ -82,25 +72,29 @@ int main (void)
                 }
             }
 
-            /* TODO: Transmit the character over IR on a NAVSWITCH_PUSH
-            event.  */
-            if (!selectionMade)
+            /* If navswitch pressed transmit your option to the opponent */
+            if (!your_selection)
             {
                 if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
                 {
                     ir_uart_putc( options[option] );
-                    selectionMade = 1;
+                    tinygl_clear();
+                    bitmap_display_run(waiting_bitmap);
+                    your_selection = options[option];
                 }
             }
 
-            if (!opponentsSelection)
+            /* If infra red has recieved an option save it*/
+            if (!opponents_selection)
             {
                 if ( ir_uart_read_ready_p() )
                 {
-                    opponentsSelection = ir_uart_getc();
+                    opponents_selection = ir_uart_getc();
                 }
             }
             display_character ( options[option] );
         }
+
+        /* compute winner etc here.
     }
 }
