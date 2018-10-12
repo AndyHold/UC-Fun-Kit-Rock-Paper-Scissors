@@ -11,7 +11,7 @@
 
 
 /** Display scrolling instructions */
-void display_instructions(char instructions[]);
+void display_instructions_init (char instructions[]);
 
 
 /** Display scrolling a single character */
@@ -22,6 +22,6 @@ void display_character (char character);
 int displaytext_run ( void );
 
 
-/** Display a Bitmap untill navswitch pressed */
-void bitmap_display_run (const uint8_t bitmap[5]);
+/** Display a column */
+void display_column (uint8_t row_pattern, uint8_t current_column);
 #endif

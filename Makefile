@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h ../../drivers/button.h ../../utils/pacer.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../utils/tinygl.h ../../utils/font.h modules/displayer.h modules/initializer.h
+game.o: game.c ../../drivers/avr/system.h ../../drivers/button.h ../../utils/pacer.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../utils/tinygl.h ../../utils/font.h modules/displayer.h modules/initializer.h ../../utils/task.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h
@@ -64,7 +64,10 @@ tinygl.o: ../../utils/tinygl.c ../../drivers/avr/system.h ../../drivers/display.
 displayer.o: modules/displayer.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../utils/tinygl.h ../../utils/font.h ../../drivers/navswitch.h modules/displayer.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-initializer.o: modules/initializer.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../utils/tinygl.h ../../utils/font.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h modules/initializer.h
+initializer.o: modules/initializer.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../utils/tinygl.h ../../utils/font.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../drivers/button.h modules/initializer.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+task.o: ../../utils/task.c ../../drivers/avr/system.h ../../drivers/avr/timer.h ../../utils/task.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 
@@ -72,7 +75,7 @@ initializer.o: modules/initializer.c ../../drivers/avr/system.h ../../drivers/av
 
 
 # Link: create ELF output file from object files.
-game.out: game.o system.o pio.o button.o timer.o pacer.o navswitch.o usart1.o prescale.o timer0.o ir_uart.o font.o ledmat.o display.o tinygl.o displayer.o initializer.o
+game.out: game.o system.o pio.o button.o timer.o pacer.o navswitch.o usart1.o prescale.o timer0.o ir_uart.o font.o ledmat.o display.o tinygl.o displayer.o initializer.o task.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

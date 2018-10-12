@@ -1,14 +1,14 @@
 #include "displayer.h"
 
-/* Module to display a scrolling text until navswitch pressed. */
+/* Display module for paper-scissors-rock / battleships game */
 
 
-void display_instructions(char instructions[])
+
+void display_instructions_init (char instructions[])
 {
     /* Display Instructions for paper scissors rock */
     tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
     tinygl_text(instructions);
-    displaytext_run();
 }
 
 void display_character (char character)
@@ -17,26 +17,6 @@ void display_character (char character)
     buffer[0] = character;
     buffer[1] = '\0';
     tinygl_text (buffer);
-}
-
-
-int displaytext_run( void )
-{
-    uint8_t finished = 0;
-    while(!finished)
-    {
-        /* wait for the pacer to finish */
-        pacer_wait();
-        navswitch_update();
-        /* TODO: Call the tinygl update function. */
-        tinygl_update();
-        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
-        {
-            finished = 1;
-        }
-
-    }
-    return 0;
 }
 
 
@@ -60,14 +40,12 @@ static const pio_t cols[] =
 static uint8_t previous_col = 0;
 
 
-
-static void display_column (uint8_t row_pattern, uint8_t current_column)
+void display_column (uint8_t row_pattern, uint8_t current_column)
 {
-
     pio_output_high(cols[previous_col]);
     uint8_t current_row = 0;
-
-    for (current_row; current_row < 7; current_row += 1) {
+    while (current_row < 7)
+    {
         if ((row_pattern >> current_row) & 1)
         {
             pio_output_low(rows[current_row]);
@@ -76,29 +54,11 @@ static void display_column (uint8_t row_pattern, uint8_t current_column)
         {
             pio_output_high(rows[current_row]);
         }
+        current_row++;
     }
 
     pio_output_low(cols[current_column]);
     previous_col = current_column;
-}
-
-
-void bitmap_display_run (const uint8_t bitmap[5])
-{
-
-    uint8_t current_column = 0;
-    uint8_t finished = 0;
-    while (!finished)
-    {
-        pacer_wait ();
-        display_column (bitmap[current_column], current_column);
-        current_column++;
-
-        if (current_column > 4)
-        {
-            current_column = 0;
-        }
-    }
 }
 
 
