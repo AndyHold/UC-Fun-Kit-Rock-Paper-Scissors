@@ -81,7 +81,7 @@ static void compare_move(char your_move, char opponent_move)
 {
 
     /*  Checks for a draw  */
-    if (your_move == opponent_move) {
+    if (your_selection == opponents_selection) {
         tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
         display_instructions_init ("DRAW");
     }
@@ -90,36 +90,36 @@ static void compare_move(char your_move, char opponent_move)
     }
 
     /*  Rock state */
-    else if (your_move == 'R') {
-        if (oppenent_move == 'S') {
+    if (your_selection == 'R') {
+        if (opponents_selection == 'S') {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             display_instructions_init ("YOU WIN");
         }
-        else if (opponent_move == 'P') {
+        else if (opponents_selection == 'P') {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             display_instructions_init ("YOU LOSE");
         }
     }
 
     /*  Paper state */
-    else if (your_move == 'P') {
-        if (opponent_move == 'R') {
+    if (your_selection == 'P') {
+        if (opponents_selection == 'R') {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             display_instructions_init ("YOU WIN");
         }
-        else if (opponent_move == 'S') {
+        else if (opponents_selection == 'S') {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             display_instructions_init ("YOU LOSE");
         }
     }
 
     /*  Scissors state  */
-    else if (your_move == 'S') {
-        if (opponent_move == 'P') {
+    if (your_selection == 'S') {
+        if (opponents_selection == 'P') {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             display_instructions_init ("YOU WIN");
         }
-        else if (opponent_move == 'R') {
+        else if (opponents_selection == 'R') {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             display_instructions_init ("YOU LOSE");
         }
