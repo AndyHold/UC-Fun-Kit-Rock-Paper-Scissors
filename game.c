@@ -70,12 +70,61 @@ static uint8_t option = 0;
 static uint8_t current_column = 0;
 static uint8_t your_turn = 0;
 static uint8_t deployed = 0;
+static uint8_t result_found = 0;
 
 
 /** Initialise button states */
 int previous_state = 1;
 int current_state = 0;
 
+static void compare_move(char your_move, char opponent_move)
+{
+
+    /*  Checks for a draw  */
+    if (your_move == opponent_move) {
+        tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+        display_instructions_init ("DRAW");
+    }
+    else {
+        result_found = 1;
+    }
+
+    /*  Rock state */
+    else if (your_move == 'R') {
+        if (oppenent_move == 'S') {
+            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+            display_instructions_init ("YOU WIN");
+        }
+        else if (opponent_move == 'P') {
+            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+            display_instructions_init ("YOU LOSE");
+        }
+    }
+
+    /*  Paper state */
+    else if (your_move == 'P') {
+        if (opponent_move == 'R') {
+            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+            display_instructions_init ("YOU WIN");
+        }
+        else if (opponent_move == 'S') {
+            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+            display_instructions_init ("YOU LOSE");
+        }
+    }
+
+    /*  Scissors state  */
+    else if (your_move == 'S') {
+        if (opponent_move == 'P') {
+            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+            display_instructions_init ("YOU WIN");
+        }
+        else if (opponent_move == 'R') {
+            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+            display_instructions_init ("YOU LOSE");
+        }
+    }
+}
 
 void display_task ( __unused__ void *data )
 {
@@ -220,6 +269,8 @@ void navswitch_task ( __unused__ void *data )
                 }
                 else
                 {
+                    // Change your turn
+                    compare_move(your_selection, opponents_selection);
                     state = STATE_SHOW_WINNER;
                 }
             }
@@ -241,6 +292,8 @@ void navswitch_task ( __unused__ void *data )
             if ( ir_uart_read_ready_p() )
             {
                 opponents_selection = ir_uart_getc();
+                /* compute the result */
+                compare_move(your_selection, opponents_selection);
                 state = STATE_SHOW_WINNER;
             }
         }
@@ -250,8 +303,13 @@ void navswitch_task ( __unused__ void *data )
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
         {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-            display_instructions_init ("Place your battleships.");
-            state = STATE_DISPLAY_DEPLOY_INSTRUCTIONS;
+            if (result_found) {
+                display_instructions_init ("Place your battleships.");
+                state = STATE_DISPLAY_DEPLOY_INSTRUCTIONS;
+            } else {
+                display_instructions_init ("Choose your option.");
+                state = STATE_INITIAL_INSTRUCTIONS;
+            }
         }
         break;
 
