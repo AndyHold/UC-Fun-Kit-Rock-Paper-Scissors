@@ -75,6 +75,14 @@ int previous_state = 1;
 int current_state = 0;
 
 
+void reset_game ( void )
+{
+    your_selection = 0;
+    opponents_selection = 0;
+    option = 0;
+}
+
+
 static void tweeter_task_init (void)
 {
     tweeter = tweeter_init (&tweeter_info, TWEETER_TASK_RATE, scale_table);
@@ -288,11 +296,16 @@ void navswitch_task ( __unused__ void *data )
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             if (opponents_selection == your_selection)
             {
-                display_instructions_init ("BATTLESHIPS BY AH AND RY");
+                reset_game ();
+                display_instructions_init ("Paper, Scissors or Rock?");
                 state = STATE_INTRODUCTION;
             }
-            display_instructions_init ("Paper, Scissors or Rock?");
-            state = STATE_INITIAL_INSTRUCTIONS;
+            else
+            {
+                reset_game ();
+                display_instructions_init ("BATTLESHIPS BY AH AND RY");
+                state = STATE_INITIAL_INSTRUCTIONS;
+            }
         }
         break;
     }
