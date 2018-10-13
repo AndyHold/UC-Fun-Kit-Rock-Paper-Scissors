@@ -8,10 +8,13 @@
 #include "modules/displayer.h"
 #include "modules/initializer.h"
 #include "task.h"
+#include "tweeter.h"
+#include "mmelody.h"
 
 
 #define PACER_RATE 500
 #define MESSAGE_RATE 20
+#define PIEZO_PIO PIO_DEFINE (PORT_D, 6)
 
 
 static const char options[3] =
@@ -22,22 +25,17 @@ static const char options[3] =
 
 /** Define polling rates in Hz.  The sound task needs to be the highest
     priority since any jitter will make the sound awful.  */
-enum {SOUND_TASK_RATE = 5000};
+enum {TWEETER_TASK_RATE = 20000};
+enum {SOUND_TASK_RATE = 100};
 enum {DISPLAY_TASK_RATE = 300};
 enum {BUTTON_TASK_RATE = 20};
+enum {TUNE_BPM_RATE = 180};
 
 
 typedef enum {STATE_INITIAL_INSTRUCTIONS, STATE_CHOOSE_OPTION,
               STATE_WAITING_FOR_OPPONENT, STATE_SHOW_WINNER,
-              STATE_DISPLAY_TURN, STATE_DISPLAY_DEPLOY_INSTRUCTIONS,
-              STATE_DEPLOY, STATE_ATTACK_INSTRUCTIONS,
-              STATE_CHOOSE_ATTACK, STATE_REJECT_ATTACK,
-              STATE_ACCEPT_ATTACK, STATE_HIT_ATTACK, STATE_SINK_ATTACK,
-              STATE_MISS_ATTACK, STATE_RESULT, STATE_DEFENDING_WAIT,
-              STATE_ATTACK_RECEIVED, STATE_HIT_DEFENCE,
-              STATE_SINK_DEFENCE, STATE_MISS_DEFENCE} state_t;
-
-static state_t state = STATE_INITIAL_INSTRUCTIONS;
+              STATE_INTRODUCTION} state_t;
+static state_t state = STATE_INTRODUCTION;
 
 
 static const uint8_t waiting_bitmap[5] =
@@ -46,82 +44,114 @@ static const uint8_t waiting_bitmap[5] =
 };
 
 
-static const uint8_t attack_bitmap[5] =
+static const char game_intro_tune[] =
 {
-    0x00, 0x00, 0x00, 0x00, 0x00
+#include "mario_theme.mmel"
+"> "
 };
-
-
-static const uint8_t defence_bitmap_solid[5] =
-{
-    0x00, 0x00, 0x00, 0x00, 0x00
-};
-
-
-static const uint8_t defence_bitmap_half[5] =
-{
-    0x00, 0x00, 0x00, 0x00, 0x00
-};
-
+/*
+static const char waiting_tune[] = "";
+*/
+static const char losing_sound[] = "A#AG#G/";
+static const char winning_sound[] = "A,A#,B,C+/";
+static const char error_sound[] = "C,C,C,";
+static const char select_sound[] = "  ,B5,E6";
+static const char move_sound[] = "E6G6E6G6";
 
 static char your_selection = 0;
 static char opponents_selection = 0;
 static uint8_t option = 0;
 static uint8_t current_column = 0;
-static uint8_t your_turn = 0;
-static uint8_t deployed = 0;
-static uint8_t result_found = 0;
+
+static tweeter_scale_t scale_table[] = TWEETER_SCALE_TABLE (TWEETER_TASK_RATE);
+static tweeter_t tweeter;
+static mmelody_t melody;
+static mmelody_obj_t melody_info;
+static tweeter_obj_t tweeter_info;
 
 
 /** Initialise button states */
 int previous_state = 1;
 int current_state = 0;
 
-static void compare_move(char your_move, char opponent_move)
+
+static void tweeter_task_init (void)
 {
+    tweeter = tweeter_init (&tweeter_info, TWEETER_TASK_RATE, scale_table);
+
+    pio_config_set (PIEZO_PIO, PIO_OUTPUT_LOW);
+}
+
+
+static void tweeter_task (__unused__ void *data)
+{
+    pio_output_set (PIEZO_PIO, tweeter_update (tweeter));
+}
+
+
+static void sound_task_init (void)
+{
+    melody = mmelody_init (&melody_info, SOUND_TASK_RATE,
+               (mmelody_callback_t) tweeter_note_play, tweeter);
+
+    mmelody_speed_set (melody, TUNE_BPM_RATE);
+}
+
+static void compare_move(char your_selection, char opponents_selection)
+{
+    /* Re-initialize scrolling text */
+    tinygl_init0 (PACER_RATE, MESSAGE_RATE);
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
 
     /*  Checks for a draw  */
-    if (your_selection == opponents_selection) {
-        tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    if (your_selection == opponents_selection)
+    {
         display_instructions_init ("DRAW");
-    }
-    else {
-        result_found = 1;
+        mmelody_play (melody, error_sound);
     }
 
     /*  Rock state */
-    if (your_selection == 'R') {
-        if (opponents_selection == 'S') {
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    if (your_selection == 'R')
+    {
+        if (opponents_selection == 'S')
+        {
             display_instructions_init ("YOU WIN");
+            mmelody_play (melody, winning_sound);
         }
-        else if (opponents_selection == 'P') {
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+        else if (opponents_selection == 'P')
+        {
             display_instructions_init ("YOU LOSE");
+            mmelody_play (melody, losing_sound);
         }
     }
 
     /*  Paper state */
-    if (your_selection == 'P') {
-        if (opponents_selection == 'R') {
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    if (your_selection == 'P')
+    {
+        if (opponents_selection == 'R')
+        {
             display_instructions_init ("YOU WIN");
+            mmelody_play (melody, winning_sound);
         }
-        else if (opponents_selection == 'S') {
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+        else if (opponents_selection == 'S')
+        {
             display_instructions_init ("YOU LOSE");
+            mmelody_play (melody, losing_sound);
         }
     }
 
     /*  Scissors state  */
-    if (your_selection == 'S') {
-        if (opponents_selection == 'P') {
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    if (your_selection == 'S')
+    {
+        if (opponents_selection == 'P')
+        {
             display_instructions_init ("YOU WIN");
+            mmelody_play (melody, winning_sound);
         }
-        else if (opponents_selection == 'R') {
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+        else if (opponents_selection == 'R')
+        {
             display_instructions_init ("YOU LOSE");
+            mmelody_play (melody, losing_sound);
         }
     }
 }
@@ -130,6 +160,10 @@ void display_task ( __unused__ void *data )
 {
     switch (state)
     {
+    case STATE_INTRODUCTION:
+        tinygl_update ();
+        break;
+
     case STATE_INITIAL_INSTRUCTIONS:
         tinygl_update ();
         break;
@@ -147,73 +181,8 @@ void display_task ( __unused__ void *data )
         break;
 
     case STATE_SHOW_WINNER:
-
-        break;
-
-    case STATE_DISPLAY_DEPLOY_INSTRUCTIONS:
-        tinygl_update();
-        break;
-
-    case STATE_DEPLOY:
-
-        break;
-
-    case STATE_DISPLAY_TURN:
         tinygl_update ();
         break;
-
-    case STATE_ATTACK_INSTRUCTIONS:
-        tinygl_update ();
-        break;
-
-    case STATE_CHOOSE_ATTACK:
-
-        break;
-
-    case STATE_REJECT_ATTACK:
-        tinygl_update ();
-        break;
-
-    case STATE_ACCEPT_ATTACK:
-
-        break;
-
-    case STATE_HIT_ATTACK:
-        tinygl_update ();
-        break;
-
-    case STATE_SINK_ATTACK:
-        tinygl_update ();
-        break;
-
-    case STATE_MISS_ATTACK:
-        tinygl_update ();
-        break;
-
-    case STATE_RESULT:
-        tinygl_update ();
-        break;
-
-    case STATE_DEFENDING_WAIT:
-
-        break;
-
-    case STATE_ATTACK_RECEIVED:
-        tinygl_update ();
-        break;
-
-    case STATE_HIT_DEFENCE:
-        tinygl_update ();
-        break;
-
-    case STATE_SINK_DEFENCE:
-        tinygl_update ();
-        break;
-
-    case STATE_MISS_DEFENCE:
-        tinygl_update ();
-        break;
-
     }
 }
 
@@ -222,10 +191,20 @@ void navswitch_task ( __unused__ void *data )
     navswitch_update();
     switch (state)
     {
+    case STATE_INTRODUCTION:
+        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
+        {
+            display_instructions_init ("Paper, Scissors or Rock?");
+            mmelody_play(melody, select_sound);
+            state = STATE_INITIAL_INSTRUCTIONS;
+        }
+        break;
+
     case STATE_INITIAL_INSTRUCTIONS:
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
         {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_STEP);
+            mmelody_play(melody, select_sound);
             state = STATE_CHOOSE_OPTION;
         }
         break;
@@ -233,6 +212,7 @@ void navswitch_task ( __unused__ void *data )
     case STATE_CHOOSE_OPTION:
         if ( navswitch_push_event_p ( NAVSWITCH_NORTH ) || navswitch_push_event_p ( NAVSWITCH_WEST ) )
         {
+            mmelody_play(melody, move_sound);
             if (option == 2)
             {
                 option = 0;
@@ -245,6 +225,7 @@ void navswitch_task ( __unused__ void *data )
         /* If navswitch north or east change to another option */
         if ( navswitch_push_event_p ( NAVSWITCH_SOUTH ) || navswitch_push_event_p ( NAVSWITCH_EAST ) )
         {
+            mmelody_play(melody, move_sound);
             if (option == 0)
             {
                 option = 2;
@@ -259,6 +240,7 @@ void navswitch_task ( __unused__ void *data )
         {
             if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
             {
+                mmelody_play(melody, select_sound);
                 ir_uart_putc( options[option] );
                 your_selection = options[option];
                 if (!opponents_selection)
@@ -289,10 +271,10 @@ void navswitch_task ( __unused__ void *data )
         /* If infra red has recieved an option save it*/
         if (!opponents_selection)
         {
+            mmelody_play(melody, game_intro_tune);
             if ( ir_uart_read_ready_p() )
             {
                 opponents_selection = ir_uart_getc();
-                /* compute the result */
                 compare_move(your_selection, opponents_selection);
                 state = STATE_SHOW_WINNER;
             }
@@ -302,196 +284,24 @@ void navswitch_task ( __unused__ void *data )
     case STATE_SHOW_WINNER:
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
         {
+            mmelody_play(melody, select_sound);
             tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-            if (result_found) {
-                display_instructions_init ("Place your battleships.");
-                state = STATE_DISPLAY_DEPLOY_INSTRUCTIONS;
-            } else {
-                display_instructions_init ("Choose your option.");
-                state = STATE_INITIAL_INSTRUCTIONS;
+            if (opponents_selection == your_selection)
+            {
+                display_instructions_init ("BATTLESHIPS BY AH AND RY");
+                state = STATE_INTRODUCTION;
             }
+            display_instructions_init ("Paper, Scissors or Rock?");
+            state = STATE_INITIAL_INSTRUCTIONS;
         }
         break;
-
-    case STATE_DISPLAY_DEPLOY_INSTRUCTIONS:
-        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
-        {
-            tinygl_clear ();
-            bitmap_display_init ();
-            state = STATE_DEPLOY;
-        }
-        break;
-
-    case STATE_DEPLOY:
-        if (button_push_event_p (0))
-/*
-            rotate_ship ();
-*/
-        break;
-
-    case STATE_DISPLAY_TURN:
-        if (your_turn)
-        {
-            tinygl_init0 (PACER_RATE, MESSAGE_RATE);
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-            display_instructions_init ("Your turn.");
-        }
-        else
-        {
-            tinygl_init0 (PACER_RATE, MESSAGE_RATE);
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-            display_instructions_init ("Their turn.");
-        }
-        break;
-
-    case STATE_ATTACK_INSTRUCTIONS:
-        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
-        {
-            tinygl_clear ();
-            bitmap_display_init ();
-            state = STATE_CHOOSE_ATTACK;
-        }
-        break;
-
-    case STATE_CHOOSE_ATTACK:
-
-        break;
-
-    case STATE_REJECT_ATTACK:
-
-        break;
-
-    case STATE_ACCEPT_ATTACK:
-
-        break;
-
-    case STATE_HIT_ATTACK:
-
-        break;
-
-    case STATE_SINK_ATTACK:
-
-        break;
-
-    case STATE_MISS_ATTACK:
-
-        break;
-
-    case STATE_RESULT:
-
-        break;
-
-    case STATE_DEFENDING_WAIT:
-
-        break;
-
-    case STATE_ATTACK_RECEIVED:
-
-        break;
-
-    case STATE_HIT_DEFENCE:
-
-        break;
-
-    case STATE_SINK_DEFENCE:
-
-        break;
-
-    case STATE_MISS_DEFENCE:
-
-        break;
-
     }
 }
 
 
 void sound_task ( __unused__ void *data )
 {
-    switch (state)
-    {
-    case STATE_INITIAL_INSTRUCTIONS:
-/*
-        mmelody_play(melody, game_intro_tune);
-*/
-        break;
-
-    case STATE_CHOOSE_OPTION:
-
-        break;
-
-    case STATE_WAITING_FOR_OPPONENT:
-
-        break;
-
-    case STATE_SHOW_WINNER:
-
-        break;
-
-    case STATE_DISPLAY_TURN:
-
-        break;
-
-    case STATE_DISPLAY_DEPLOY_INSTRUCTIONS:
-
-        break;
-
-    case STATE_DEPLOY:
-
-        break;
-
-    case STATE_ATTACK_INSTRUCTIONS:
-
-        break;
-
-    case STATE_CHOOSE_ATTACK:
-
-        break;
-
-    case STATE_REJECT_ATTACK:
-
-        break;
-
-    case STATE_ACCEPT_ATTACK:
-
-        break;
-
-    case STATE_HIT_ATTACK:
-
-        break;
-
-    case STATE_SINK_ATTACK:
-
-        break;
-
-    case STATE_MISS_ATTACK:
-
-        break;
-
-    case STATE_RESULT:
-
-        break;
-
-    case STATE_DEFENDING_WAIT:
-
-        break;
-
-    case STATE_ATTACK_RECEIVED:
-
-        break;
-
-    case STATE_HIT_DEFENCE:
-
-        break;
-
-    case STATE_SINK_DEFENCE:
-
-        break;
-
-    case STATE_MISS_DEFENCE:
-
-        break;
-
-    }
+    mmelody_update (melody);
 }
 
 
@@ -499,6 +309,8 @@ int main (void)
 {
     task_t tasks[] =
     {
+        {.func = tweeter_task, .period = TASK_RATE / TWEETER_TASK_RATE,
+         .data = 0},
         {.func = sound_task, .period = TASK_RATE / SOUND_TASK_RATE,
          .data = 0},
         {.func = display_task, .period = TASK_RATE / DISPLAY_TASK_RATE,
@@ -509,6 +321,15 @@ int main (void)
 
     /* Initialise Everything  */
     initialize_all(PACER_RATE, MESSAGE_RATE);
-    display_instructions_init ("Choose your option.");
+    display_instructions_init ("BATTLESHIPS BY AH AND RY");
+    tweeter_task_init ();
+    sound_task_init ();
+
+    /* Play introduction song */
+    mmelody_play(melody, game_intro_tune);
+/*
+    mmelody_play(melody, move_sound);
+*/
+
     task_schedule (tasks, ARRAY_SIZE (tasks));
 }

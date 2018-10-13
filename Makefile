@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h ../../drivers/button.h ../../utils/pacer.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../utils/tinygl.h ../../utils/font.h modules/displayer.h modules/initializer.h ../../utils/task.h
+game.o: game.c ../../drivers/avr/system.h ../../drivers/button.h ../../utils/pacer.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../utils/tinygl.h ../../utils/font.h modules/displayer.h modules/initializer.h ../../utils/task.h ../../extra/mmelody.h  ../../extra/ticker.h ../../extra/tweeter.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h
@@ -70,12 +70,22 @@ initializer.o: modules/initializer.c ../../drivers/avr/system.h ../../drivers/av
 task.o: ../../utils/task.c ../../drivers/avr/system.h ../../drivers/avr/timer.h ../../utils/task.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
+ticker.o: ../../extra/ticker.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+tweeter.o: ../../extra/tweeter.c ../../drivers/avr/system.h ../../extra/ticker.h ../../extra/tweeter.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+
+mmelody.o: ../../extra/mmelody.c ../../drivers/avr/system.h ../../extra/mmelody.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
 
 
 
 
 # Link: create ELF output file from object files.
-game.out: game.o system.o pio.o button.o timer.o pacer.o navswitch.o usart1.o prescale.o timer0.o ir_uart.o font.o ledmat.o display.o tinygl.o displayer.o initializer.o task.o
+game.out: game.o system.o pio.o button.o timer.o pacer.o navswitch.o usart1.o prescale.o timer0.o ir_uart.o font.o ledmat.o display.o tinygl.o displayer.o initializer.o task.o ticker.o tweeter.o mmelody.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 
