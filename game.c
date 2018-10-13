@@ -49,9 +49,7 @@ static const char game_intro_tune[] =
 #include "mario_theme.mmel"
 "> "
 };
-/*
-static const char waiting_tune[] = "";
-*/
+static const char waiting_tune[] = "<ABCDEFGFEDCBA>40";
 static const char losing_sound[] = "A#AG#G/";
 static const char winning_sound[] = "A,A#,B,C+/";
 static const char error_sound[] = "C,C,C,";
@@ -255,7 +253,7 @@ void navswitch_task ( __unused__ void *data )
                 {
                     tinygl_clear ();
                     bitmap_display_init ();
-                    mmelody_play(melody, game_intro_tune);
+                    mmelody_play(melody, waiting_tune);
                     state = STATE_WAITING_FOR_OPPONENT;
                 }
                 else
@@ -303,7 +301,7 @@ void navswitch_task ( __unused__ void *data )
             else
             {
                 reset_game ();
-                display_instructions_init ("BATTLESHIPS BY AH AND RY");
+                display_instructions_init ("JANKEN PON BY AH AND RY");
                 state = STATE_INITIAL_INSTRUCTIONS;
             }
         }
@@ -334,7 +332,7 @@ int main (void)
 
     /* Initialise Everything  */
     initialize_all(PACER_RATE, MESSAGE_RATE);
-    display_instructions_init ("BATTLESHIPS BY AH AND RY");
+    display_instructions_init ("JANKEN PON BY AH AND RY");
     tweeter_task_init ();
     sound_task_init ();
 
