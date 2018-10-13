@@ -55,8 +55,8 @@ static const char waiting_tune[] = "";
 static const char losing_sound[] = "A#AG#G/";
 static const char winning_sound[] = "A,A#,B,C+/";
 static const char error_sound[] = "C,C,C,";
-static const char select_sound[] = "  ,B5,E6";
-static const char move_sound[] = "E6G6E6G6";
+static const char select_sound[] = "B5,E6";
+static const char move_sound[] = "E6,G6,";
 
 static char your_selection = 0;
 static char opponents_selection = 0;
@@ -247,6 +247,7 @@ void navswitch_task ( __unused__ void *data )
                 {
                     tinygl_clear ();
                     bitmap_display_init ();
+                    mmelody_play(melody, game_intro_tune);
                     state = STATE_WAITING_FOR_OPPONENT;
                 }
                 else
@@ -271,7 +272,6 @@ void navswitch_task ( __unused__ void *data )
         /* If infra red has recieved an option save it*/
         if (!opponents_selection)
         {
-            mmelody_play(melody, game_intro_tune);
             if ( ir_uart_read_ready_p() )
             {
                 opponents_selection = ir_uart_getc();
