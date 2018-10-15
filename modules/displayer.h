@@ -10,6 +10,10 @@
 #include "navswitch.h"
 
 
+enum {DISPLAY_TASK_RATE = 300};
+enum {MESSAGE_RATE = 20};
+
+
 /** Display scrolling instructions */
 void display_instructions_init (char instructions[]);
 
