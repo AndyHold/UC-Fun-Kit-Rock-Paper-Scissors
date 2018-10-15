@@ -4,7 +4,7 @@ Rock, paper, scissors game which can be played between the two microcontroller d
 
 The game utilises task scheduling to schedule the indivual states to progress the game. Two controllers will be able to
 choose a move each using the navswitch, the selected moves from each device will be computed and a result will be 
-returned, and displayed on the device LED matrix. 
+returned which will displayed on the device LED matrix. 
 
 It is split in the states of:
 
