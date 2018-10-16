@@ -1,3 +1,38 @@
+Rock, paper, scissors game:
+
+Rock, paper, scissors game which can be played between the two microcontroller devices through infra-red communication.
+
+The game utilises task scheduling to schedule the indivual states to progress the game. Two controllers will be able to
+choose a move each using the navswitch, the selected moves from each device will be computed and a result will be 
+returned which will displayed on the device LED matrix. 
+
+It is split in the states of:
+
+INTRODUCTION:
+    Where an introduction message is displayed on the LED matrix with scrolling text, as a general game introduction.
+    In this state, pushing the navigation switch will change the state to the following state of the scheduler.
+
+INITIAL_INSTUCTIONS:
+    -
+
+CHOOSE_OPTIONS:
+    In this state, the user can choose between 'P' = Paper, 'S' = Scissors, 'R' = Rock. Where the option is displayed 
+    on the LED matrix with the appropriate letter symbol. The symbol can then be changed with the navswitch button 
+    actions (NORTH, WEST, SOUTH, EAST). The Navswith push event will confirm the selection. The user will go into a 
+    WAITING_FOR_OPPONENT state if the opponent has not yet selected there option.
+    
+WAITING_FOR_OPPONENT: 
+    This state will be active till the user has selected their option, the microcontroller is in a waiting state to 
+    recieve the oppoonents symbol through infrared communitcation. Once the opponent move is selected, the opponent
+    selection and the user selection will be computed for a result to see who is victorious or weather it is a draw.
+    The state will then be changed to the SHOW_WINNER state.
+    
+SHOW_WINNER:
+    The show winner state will display the result on the LED matrix which the appropriate message, "YOU WIN", "YOU LOSE",
+    or in the case of a draw "DRAW". In the case of a draw the state will go back to the INTRODUCTION state to issue a 
+    redraw in selection till the winner is decided. In any other case, the state will go the beginning state. 
+    
+
 Battleships game plan:
 
 
