@@ -20,8 +20,8 @@
 void initialize_all (uint16_t pacer_rate, uint16_t message_rate);
 
 
-/** Initialize tiny GL */
-void tinygl_init0 ( uint16_t pacer_rate, uint16_t message_rate );
+/** Initialize common display elements for text */
+void text_display_init ( uint16_t pacer_rate, uint16_t message_rate );
 
 
 /** Initialize Bitmap Display */

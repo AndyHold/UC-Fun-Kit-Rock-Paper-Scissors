@@ -26,7 +26,7 @@ void reset_game ( void )
 static void compare_move(char your_selection, char opponents_selection)
 {
     /* Re-initialize scrolling text */
-    tinygl_init0 (DISPLAY_TASK_RATE, MESSAGE_RATE);
+    text_display_init (DISPLAY_TASK_RATE, MESSAGE_RATE);
     tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
 
     /*  Checks for a draw  */
@@ -215,7 +215,6 @@ void button_task ( __unused__ void *data )
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
         {
             mmelody_play (melody, select_sound);
-            tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
             if (opponents_selection == your_selection)
             {
                 reset_game ();

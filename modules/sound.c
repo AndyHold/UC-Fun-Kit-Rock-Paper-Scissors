@@ -1,6 +1,9 @@
 #include "sound.h"
 
 
+tweeter_scale_t scale_table[] = TWEETER_SCALE_TABLE (TWEETER_TASK_RATE);
+
+
 void tweeter_task_init (void)
 {
     tweeter = tweeter_init (&tweeter_info, TWEETER_TASK_RATE, scale_table);

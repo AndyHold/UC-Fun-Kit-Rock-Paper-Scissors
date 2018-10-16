@@ -5,12 +5,10 @@ void initialize_all (uint16_t pacer_rate, uint16_t message_rate)
 {
     system_init ();
     /* Initialize tiny_gl */
-    tinygl_init0 (pacer_rate, message_rate);
+    text_display_init (pacer_rate, message_rate);
     /* Initialize buttons */
     button_init ();
     navswitch_init();
-    /* Initialise Pacer */
-    pacer_init (pacer_rate);
     /* Initialize Infa Red */
     ir_uart_init ();
     /* Initialize Button */
@@ -18,8 +16,8 @@ void initialize_all (uint16_t pacer_rate, uint16_t message_rate)
 }
 
 
-/** Initialize tiny GL */
-void tinygl_init0 ( uint16_t pacer_rate, uint16_t message_rate )
+/** Initialize common display elements for text */
+void text_display_init ( uint16_t pacer_rate, uint16_t message_rate )
 {
     tinygl_init (pacer_rate);
     tinygl_font_set (&font5x7_1);

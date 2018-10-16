@@ -24,18 +24,17 @@ void sound_task_init (void);
 
 
 /** Initialize sound objects. */
-static tweeter_scale_t scale_table[] = TWEETER_SCALE_TABLE (TWEETER_TASK_RATE);
-static tweeter_t tweeter;
-static mmelody_t melody;
-static mmelody_obj_t melody_info;
-static tweeter_obj_t tweeter_info;
+tweeter_t tweeter;
+mmelody_t melody;
+mmelody_obj_t melody_info;
+tweeter_obj_t tweeter_info;
 
 
 /** Initialize sound objects. */
-static tweeter_t tweeter;
-static mmelody_t melody;
-static mmelody_obj_t melody_info;
-static tweeter_obj_t tweeter_info;
+tweeter_t tweeter;
+mmelody_t melody;
+mmelody_obj_t melody_info;
+tweeter_obj_t tweeter_info;
 
 
 /** Tweeter task to be performed. */
