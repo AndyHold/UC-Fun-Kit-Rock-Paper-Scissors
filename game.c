@@ -147,6 +147,7 @@ void button_task ( __unused__ void *data )
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
         {
             display_instructions_init (instruction);
+            mmelody_speed_set (melody, TUNE_BPM_RATE);
             mmelody_play (melody, select_sound);
             state = STATE_INITIAL_INSTRUCTIONS;
         }
