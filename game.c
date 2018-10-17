@@ -33,7 +33,7 @@ static void compare_move(char your_selection, char opponents_selection)
     if (your_selection == opponents_selection)
     {
         display_instructions_init (draw);
-            mmelody_play (melody, error_sound);
+        mmelody_play (melody, error_sound);
     }
 
     /*  Rock state */
