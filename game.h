@@ -12,10 +12,12 @@
 #include "modules/displayer.h"
 #include "modules/initializer.h"
 #include "modules/sound.h"
+#include "led.h"
 #include "task.h"
 #include "tweeter.h"
 #include "mmelody.h"
 #include "string.h"
+
 
 
 /** Initialize messages for display */
@@ -60,6 +62,9 @@ static char your_selection = 0;
 static char opponents_selection = 0;
 static uint8_t option = 0;
 static uint8_t current_column = 0;
+static uint8_t counter = 0;
+static uint8_t winner = 0;
+static uint8_t led_state = 0;
 
 
 /** Options for paper scissors rock*/

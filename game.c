@@ -4,6 +4,7 @@
 /** Define polling rates in Hz.  The sound task needs to be the highest
  *  priority since any jitter will make the sound awful.  */
 enum {BUTTON_TASK_RATE = 20};
+enum {FLASHER_TASK_RATE = 10};
 
 
 /** Initialise button states. */
@@ -18,6 +19,7 @@ void reset_game ( void )
     your_selection = 0;
     opponents_selection = 0;
     option = 0;
+    winner = 0;
 }
 
 
@@ -41,6 +43,7 @@ static void compare_move(char your_selection, char opponents_selection)
     {
         if (opponents_selection == 'S')
         {
+            winner = 1;
             display_instructions_init (win);
             mmelody_play (melody, win_sound);
         }
@@ -56,6 +59,7 @@ static void compare_move(char your_selection, char opponents_selection)
     {
         if (opponents_selection == 'R')
         {
+            winner = 1;
             display_instructions_init (win);
             mmelody_play (melody, win_sound);
         }
@@ -71,6 +75,7 @@ static void compare_move(char your_selection, char opponents_selection)
     {
         if (opponents_selection == 'P')
         {
+            winner = 1;
             display_instructions_init (win);
             mmelody_play (melody, win_sound);
         }
@@ -114,6 +119,22 @@ void display_task ( __unused__ void *data )
     }
 }
 
+/** Flasher Task to be performed. */
+void flasher_task ( __unused__ void *data )
+{
+    if (state == STATE_SHOW_WINNER) {
+        if (winner) {
+            led_set  (LED1, led_state);
+            led_state = !led_state;
+        }
+        else if (counter % 2)
+        {
+            led_set  (LED1, led_state);
+            led_state = !led_state;
+        }
+        counter++;
+    }
+}
 
 /** Navswitch Task to be performed. */
 void button_task ( __unused__ void *data )
@@ -221,6 +242,7 @@ void button_task ( __unused__ void *data )
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
         {
             mmelody_play (melody, select_sound);
+            led_set  (LED1, 0);
             if (opponents_selection == your_selection)
             {
                 reset_game ();
@@ -251,6 +273,8 @@ int main (void)
         {.func = display_task, .period = TASK_RATE / DISPLAY_TASK_RATE,
          .data = 0},
         {.func = button_task, .period = TASK_RATE / BUTTON_TASK_RATE,
+         .data = 0},
+        {.func = flasher_task, .period = TASK_RATE / FLASHER_TASK_RATE,
          .data = 0}
     };
 
@@ -259,6 +283,9 @@ int main (void)
     display_instructions_init (intro_message);
     tweeter_task_init ();
     sound_task_init ();
+    /* Initialize Led */
+    led_init ();
+    led_set  (LED1, 0);
 
     /* Play introduction song */
     mmelody_play(melody, intro_music);

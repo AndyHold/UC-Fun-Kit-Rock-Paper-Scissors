@@ -11,6 +11,7 @@
 #include "navswitch.h"
 #include "ir_uart.h"
 #include "button.h"
+#include "led.h"
 
 
 #define BTN_PIO PIO_DEFINE (PORT_D, 7)
