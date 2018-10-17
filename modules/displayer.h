@@ -1,3 +1,12 @@
+/** @file   displayer.h
+    @author A.Holden & R.Yoshinari
+    @date   17 Oct 2018
+    @brief  Displayer Module
+    @note   This is the displayer module containing methods to
+    display text and images on the led matrix of the fun kit.
+*/
+
+
 #ifndef DISPLAYER_H
 #define DISPLAYER_H
 
@@ -5,7 +14,7 @@
 #include "pio.h"
 #include "pacer.h"
 #include "tinygl.h"
-#include "../fonts/font5x7_1.h"
+#include "../fonts/font3x5_1.h"
 #include "string.h"
 #include "navswitch.h"
 

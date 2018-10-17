@@ -1,3 +1,13 @@
+/** @file   sound.h
+    @author A.Holden & R.Yoshinari
+    @date   17 Oct 2018
+    @brief  Sound Module
+    @note   This is the sound module containing methods to
+    play sound with a piezo buzzer using pins 6 and ground of the fun
+    kit.
+*/
+
+
 #ifndef SOUND_H
 #define SOUND_H
 

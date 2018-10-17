@@ -1,3 +1,12 @@
+/** @file   displayer.c
+    @author A.Holden & R.Yoshinari
+    @date   17 Oct 2018
+    @brief  Displayer Module
+    @note   This is the displayer module containing methods to
+    display text and images on the led matrix of the fun kit.
+*/
+
+
 #include "displayer.h"
 
 /* Display module for paper-scissors-rock / battleships game */
@@ -13,9 +22,10 @@ void display_instructions_init (char instructions[])
 
 void display_character (char character)
 {
-    char buffer[2];
+    char buffer[3];
     buffer[0] = character;
-    buffer[1] = '\0';
+    buffer[1] = ' ';
+    buffer[2] = '\0';
     tinygl_text (buffer);
 }
 

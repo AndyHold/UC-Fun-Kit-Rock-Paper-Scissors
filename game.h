@@ -1,3 +1,11 @@
+/** @file   game.h
+    @author A.Holden & R.Yoshinari
+    @date   17 Oct 2018
+    @brief  Paper Scissors Rock Game
+    @note   This is the main game module containing the main method.
+*/
+
+
 #ifndef GAME_H
 #define GAME_H
 
@@ -8,7 +16,7 @@
 #include "navswitch.h"
 #include "ir_uart.h"
 #include "tinygl.h"
-#include "../fonts/font5x7_1.h"
+#include "../fonts/font3x5_1.h"
 #include "modules/displayer.h"
 #include "modules/initializer.h"
 #include "modules/sound.h"

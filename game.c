@@ -1,3 +1,11 @@
+/** @file   game.c
+    @author A.Holden & R.Yoshinari
+    @date   17 Oct 2018
+    @brief  Paper Scissors Rock Game
+    @note   This is the main game module containing the main method.
+*/
+
+
 #include "game.h"
 
 
