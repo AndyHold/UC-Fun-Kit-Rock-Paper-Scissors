@@ -140,6 +140,7 @@ void flasher_task ( __unused__ void *data )
 void button_task ( __unused__ void *data )
 {
     navswitch_update();
+    button_update ();
     switch (state)
     {
     case STATE_INTRODUCTION:
@@ -152,7 +153,7 @@ void button_task ( __unused__ void *data )
         break;
 
     case STATE_INITIAL_INSTRUCTIONS:
-        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
+        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) || button_push_event_p ( 0 ) )
         {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_STEP);
             mmelody_play (melody, select_sound);
@@ -189,7 +190,7 @@ void button_task ( __unused__ void *data )
         /* If navswitch pressed transmit your option to the opponent */
         if (!your_selection)
         {
-            if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
+            if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) || button_push_event_p ( 0 ) )
             {
                 mmelody_play (melody, select_sound);
                 ir_uart_putc( options[option] );
@@ -239,7 +240,7 @@ void button_task ( __unused__ void *data )
         break;
 
     case STATE_SHOW_WINNER:
-        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
+        if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) || button_push_event_p ( 0 ) )
         {
             mmelody_play (melody, select_sound);
             led_set  (LED1, 0);
