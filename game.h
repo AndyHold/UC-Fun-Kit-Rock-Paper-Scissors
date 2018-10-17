@@ -15,6 +15,7 @@
 #include "task.h"
 #include "tweeter.h"
 #include "mmelody.h"
+#include "string.h"
 
 
 /** Initialize messages for display */

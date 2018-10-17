@@ -193,7 +193,10 @@ void button_task ( __unused__ void *data )
         {
             if ( ir_uart_read_ready_p() )
             {
-                opponents_selection = ir_uart_getc();
+                char recieved_char = ir_uart_getc();
+                if (memchr(options, recieved_char, sizeof(options))) {
+                    opponents_selection = recieved_char;
+                }
             }
         }
         break;
@@ -204,9 +207,12 @@ void button_task ( __unused__ void *data )
         {
             if ( ir_uart_read_ready_p() )
             {
-                opponents_selection = ir_uart_getc();
-                compare_move(your_selection, opponents_selection);
-                state = STATE_SHOW_WINNER;
+                char recieved_char = ir_uart_getc();
+                if (memchr(options, recieved_char, sizeof(options))) {
+                    opponents_selection = recieved_char;
+                    compare_move(your_selection, opponents_selection);
+                    state = STATE_SHOW_WINNER;
+                }
             }
         }
         break;
