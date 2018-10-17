@@ -19,7 +19,7 @@
 #include "navswitch.h"
 
 
-enum {DISPLAY_TASK_RATE = 300};
+enum {DISPLAY_TASK_RATE = 1000};
 enum {MESSAGE_RATE = 20};
 
 
