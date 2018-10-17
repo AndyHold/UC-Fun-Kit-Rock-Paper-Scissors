@@ -12,7 +12,7 @@
 
 enum {TWEETER_TASK_RATE = 20000};
 enum {SOUND_TASK_RATE = 100};
-enum {TUNE_BPM_RATE = 180};
+enum {TUNE_BPM_RATE = 120};
 
 
 /** Initialize tweeter task. */
