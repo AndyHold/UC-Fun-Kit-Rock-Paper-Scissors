@@ -302,4 +302,5 @@ int main (void)
 
     /* Start task scheduler */
     task_schedule (tasks, ARRAY_SIZE (tasks));
+    return 1;
 }
