@@ -11,7 +11,7 @@ different melody.
 Basic Instructions:
     Confirming / Moving to the next state - Pushing the navswitch.
     Choosing options - Navswitch directional actions North, East, South, West.
-    Display - Messages and symbols will be displayed in the LED matrix.
+    Display - Messages and symbols will be displayed in the LED matrix horizontally.
     Sound - Buzzer is plugged in to the microcontroller to enable sound throughout the game. 
 
 It is split in the states of:
@@ -43,8 +43,8 @@ SHOW_WINNER:
     The show winner state will display the result on the LED matrix which the appropriate message, "YOU WIN", "YOU LOSE",
     or in the case of a draw "DRAW". In the case of a draw the state will go back to the INTRODUCTION state to issue a 
     redraw in selection till the winner is decided. In any other case, the state will go the beginning state. There will
-    be a unique melody for the lose / win result. E.g. a celebratory melody for the winner. There is also a flicker on the
-    LED. So a winner with have a flashing light at a faster rate in comparison to the looser. 
+    be a unique melody for the lose / win result. E.g. a celebratory melody for the winner. There is also a LED flicker. 
+    So a winner with have a flashing light at a faster rate in comparison to the looser. 
     
 The game will reset to the introduction after a navswitch push event.
     
