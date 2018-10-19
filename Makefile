@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h ../../drivers/button.h ../../utils/pacer.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../utils/tinygl.h ../../utils/font.h modules/displayer.h modules/initializer.h ../../drivers/led.h ../../utils/task.h ../../extra/mmelody.h  ../../extra/ticker.h ../../extra/tweeter.h game.h modules/sound.h
+game.o: game.c ../../drivers/avr/system.h ../../drivers/button.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../utils/tinygl.h modules/displayer.h ../../drivers/led.h ../../utils/task.h ../../extra/mmelody.h modules/sound.h game.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h
@@ -29,9 +29,6 @@ button.o: ../../drivers/button.c ../../drivers/avr/pio.h ../../drivers/avr/syste
 	$(CC) -c $(CFLAGS) $< -o $@
 
 timer.o: ../../drivers/avr/timer.c ../../drivers/avr/system.h ../../drivers/avr/timer.h
-	$(CC) -c $(CFLAGS) $< -o $@
-
-pacer.o: ../../utils/pacer.c ../../drivers/avr/system.h ../../drivers/avr/timer.h ../../utils/pacer.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 navswitch.o: ../../drivers/navswitch.c ../../drivers/avr/delay.h ../../drivers/avr/pio.h ../../drivers/avr/system.h ../../drivers/navswitch.h
@@ -61,10 +58,7 @@ display.o: ../../drivers/display.c ../../drivers/avr/system.h ../../drivers/disp
 tinygl.o: ../../utils/tinygl.c ../../drivers/avr/system.h ../../drivers/display.h ../../utils/font.h ../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-displayer.o: modules/displayer.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../utils/tinygl.h ../../utils/font.h ../../drivers/navswitch.h modules/displayer.h
-	$(CC) -c $(CFLAGS) $< -o $@
-
-initializer.o: modules/initializer.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../utils/tinygl.h ../../utils/font.h ../../drivers/led.h  ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../drivers/button.h modules/initializer.h
+displayer.o: modules/displayer.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/tinygl.h ../../utils/font.h modules/displayer.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 task.o: ../../utils/task.c ../../drivers/avr/system.h ../../drivers/avr/timer.h ../../utils/task.h
@@ -86,7 +80,7 @@ led.o: ../../drivers/led.c ../../drivers/avr/pio.h ../../drivers/led.h ../../dri
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # Link: create ELF output file from object files.
-game.out: game.o system.o pio.o button.o timer.o pacer.o navswitch.o usart1.o prescale.o timer0.o ir_uart.o font.o ledmat.o display.o tinygl.o displayer.o initializer.o task.o ticker.o tweeter.o mmelody.o sound.o led.o
+game.out: game.o system.o pio.o button.o timer.o navswitch.o usart1.o prescale.o timer0.o ir_uart.o font.o ledmat.o display.o tinygl.o displayer.o task.o ticker.o tweeter.o mmelody.o sound.o led.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

@@ -11,15 +11,19 @@
 #ifndef SOUND_H
 #define SOUND_H
 
+
+/** All included modules required by sound.c */
 #include "system.h"
 #include "tweeter.h"
 #include "pio.h"
 #include "mmelody.h"
 
 
+/** Define piezo on pin 6 of port D and use ground for the other pin */
 #define PIEZO_PIO PIO_DEFINE (PORT_D, 6)
 
 
+/** Initialize the task rates for sound */
 enum {TWEETER_TASK_RATE = 20000};
 enum {SOUND_TASK_RATE = 100};
 enum {TUNE_BPM_RATE = 250};

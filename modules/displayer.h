@@ -10,21 +10,29 @@
 #ifndef DISPLAYER_H
 #define DISPLAYER_H
 
+
+/** All included modules required by displayer.c */
 #include "system.h"
 #include "pio.h"
-#include "pacer.h"
 #include "tinygl.h"
 #include "../fonts/font3x5_1.h"
-#include "string.h"
-#include "navswitch.h"
 
 
+/** Initialise task rates for display */
 enum {DISPLAY_TASK_RATE = 1000};
 enum {MESSAGE_RATE = 20};
 
 
 /** Display scrolling instructions */
 void display_instructions_init (char instructions[]);
+
+
+/** Initialize common display elements for text */
+void text_display_init ( uint16_t pacer_rate, uint16_t message_rate );
+
+
+/** Initialize Bitmap Display */
+void bitmap_display_init ( void );
 
 
 /** Display scrolling a single character */

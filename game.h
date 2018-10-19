@@ -1,7 +1,7 @@
 /** @file   game.h
     @author A.Holden & R.Yoshinari
     @date   17 Oct 2018
-    @brief  Paper Scissors Rock Game
+    @brief  Paper Scissors Rock Game Made for the UCFK4 (UC Fun Kit 4)
     @note   This is the main game module containing the main method.
 */
 
@@ -10,22 +10,22 @@
 #define GAME_H
 
 
+/** All included modules required by game.c */
 #include "system.h"
 #include "button.h"
-#include "pacer.h"
 #include "navswitch.h"
 #include "ir_uart.h"
 #include "tinygl.h"
-#include "../fonts/font3x5_1.h"
 #include "modules/displayer.h"
-#include "modules/initializer.h"
 #include "modules/sound.h"
 #include "led.h"
 #include "task.h"
-#include "tweeter.h"
 #include "mmelody.h"
 #include "string.h"
 
+
+/** define BTN on Port D pin 7 */
+#define BTN_PIO PIO_DEFINE (PORT_D, 7)
 
 
 /** Initialize messages for display */
@@ -57,7 +57,7 @@ static char waiting_music[] =
 /** Define an enum of the state the game is in at each point to be
  *  used in switch statements during the tasks. */
 typedef enum {STATE_INITIAL_INSTRUCTIONS, STATE_CHOOSE_OPTION,
-              STATE_WAITING_FOR_OPPONENT, STATE_SHOW_WINNER,
+              STATE_WAITING_FOR_OPPONENT, STATE_SHOW_RESULT,
               STATE_INTRODUCTION} state_t;
 
 

@@ -8,10 +8,13 @@
 */
 
 
+/** Include sound.h file which contains all other imported modules. */
 #include "sound.h"
 
 
+/** Initialize the tweeter scale table used by the mmelody module */
 tweeter_scale_t scale_table[] = TWEETER_SCALE_TABLE (TWEETER_TASK_RATE);
+
 
 /** Initialize tweeter task. */
 void tweeter_task_init (void)
@@ -20,11 +23,13 @@ void tweeter_task_init (void)
     pio_config_set (PIEZO_PIO, PIO_OUTPUT_LOW);
 }
 
+
 /** Tweeter task to be performed. */
 void tweeter_task (__unused__ void *data)
 {
     pio_output_set (PIEZO_PIO, tweeter_update (tweeter));
 }
+
 
 /** Initialize sound task. */
 void sound_task_init (void)
@@ -34,6 +39,7 @@ void sound_task_init (void)
 
     mmelody_speed_set (melody, TUNE_BPM_RATE);
 }
+
 
 /** Sound task to be performed. */
 void sound_task ( __unused__ void *data )
