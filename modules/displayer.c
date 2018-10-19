@@ -9,10 +9,9 @@
 
 #include "displayer.h"
 
-/* Display module for paper-scissors-rock / battleships game */
+/* Display module for paper-scissors-rock */
 
-
-
+/** Display scrolling instructions */
 void display_instructions_init (char instructions[])
 {
     /* Display Instructions for paper scissors rock */
@@ -20,6 +19,7 @@ void display_instructions_init (char instructions[])
     tinygl_text(instructions);
 }
 
+/** Display scrolling a single character */
 void display_character (char character)
 {
     char buffer[3];
@@ -49,7 +49,7 @@ static const pio_t cols[] =
 
 static uint8_t previous_col = 0;
 
-
+/** Display a column */
 void display_column (uint8_t row_pattern, uint8_t current_column)
 {
     pio_output_high(cols[previous_col]);

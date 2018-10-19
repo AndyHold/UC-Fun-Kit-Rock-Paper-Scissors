@@ -10,7 +10,7 @@
 
 #include "initializer.h"
 
-
+/** Initialize everything */
 void initialize_all (uint16_t pacer_rate, uint16_t message_rate)
 {
     system_init ();
@@ -35,7 +35,7 @@ void text_display_init ( uint16_t pacer_rate, uint16_t message_rate )
     tinygl_text_dir_set (TINYGL_TEXT_DIR_ROTATE);
 }
 
-
+/** Initialize Bitmap Display */
 void bitmap_display_init ( void )
 {
     /* Initialise LED matrix pins.  */

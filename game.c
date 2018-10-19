@@ -99,6 +99,7 @@ static void compare_move(char your_selection, char opponents_selection)
 /** Display task to be performed. */
 void display_task ( __unused__ void *data )
 {
+    /* Switch statement for updating the tinygl in each case */
     switch (state)
     {
     case STATE_INTRODUCTION:
@@ -130,11 +131,14 @@ void display_task ( __unused__ void *data )
 /** Flasher Task to be performed. */
 void flasher_task ( __unused__ void *data )
 {
+    /* Checks if the state is show winner */
     if (state == STATE_SHOW_WINNER) {
+        /* Enables the led to flash */
         if (winner) {
             led_set  (LED1, led_state);
             led_state = !led_state;
         }
+        /* Enables the led to flash at half the frequency */
         else if (counter % 2)
         {
             led_set  (LED1, led_state);
@@ -149,9 +153,12 @@ void button_task ( __unused__ void *data )
 {
     navswitch_update();
     button_update ();
+
+    /* Switch statement for describing navswitch actions for each case */
     switch (state)
     {
     case STATE_INTRODUCTION:
+        /* If navswitch push change to the instruction state */
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) )
         {
             display_instructions_init (instruction);
@@ -162,6 +169,7 @@ void button_task ( __unused__ void *data )
         break;
 
     case STATE_INITIAL_INSTRUCTIONS:
+        /* If navswtich push change to the choose option state */
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) || button_push_event_p ( 0 ) )
         {
             tinygl_text_mode_set (TINYGL_TEXT_MODE_STEP);
@@ -171,6 +179,7 @@ void button_task ( __unused__ void *data )
         break;
 
     case STATE_CHOOSE_OPTION:
+        /* If navswitch north or west change to another option */
         if ( navswitch_push_event_p ( NAVSWITCH_NORTH ) || navswitch_push_event_p ( NAVSWITCH_WEST ) )
         {
             mmelody_play (melody, move_sound);
@@ -183,7 +192,7 @@ void button_task ( __unused__ void *data )
                 option++;
             }
         }
-        /* If navswitch north or east change to another option */
+        /* If navswitch south or east change to another option */
         if ( navswitch_push_event_p ( NAVSWITCH_SOUTH ) || navswitch_push_event_p ( NAVSWITCH_EAST ) )
         {
             mmelody_play (melody, move_sound);
@@ -196,7 +205,7 @@ void button_task ( __unused__ void *data )
                 option--;
             }
         }
-        /* If navswitch pressed transmit your option to the opponent */
+        /* If navswitch push transmit your option to the opponent */
         if (!your_selection)
         {
             if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) || button_push_event_p ( 0 ) )
@@ -204,6 +213,7 @@ void button_task ( __unused__ void *data )
                 mmelody_play (melody, select_sound);
                 ir_uart_putc( options[option] );
                 your_selection = options[option];
+                /* If opponent selection has not been recieved */
                 if (!opponents_selection)
                 {
                     tinygl_clear ();
@@ -213,7 +223,7 @@ void button_task ( __unused__ void *data )
                 }
                 else
                 {
-                    // Change your turn
+                    /* Computes your selection and opponents selection */
                     compare_move(your_selection, opponents_selection);
                     state = STATE_SHOW_WINNER;
                 }
@@ -222,9 +232,11 @@ void button_task ( __unused__ void *data )
         /* If infra red has recieved an option save it*/
         if (!opponents_selection)
         {
+            /* If RPS symbol has been recieved */
             if ( ir_uart_read_ready_p() )
             {
                 char recieved_char = ir_uart_getc();
+                /* Checks the received char is a RPS symbol */
                 if (memchr(options, recieved_char, sizeof(options))) {
                     opponents_selection = recieved_char;
                 }
@@ -236,8 +248,10 @@ void button_task ( __unused__ void *data )
         /* If infra red has recieved an option save it*/
         if (!opponents_selection)
         {
+            /* If RPS symbol has been recieved */
             if ( ir_uart_read_ready_p() )
             {
+                /* Checks the received char is a RPS symbol */
                 char recieved_char = ir_uart_getc();
                 if (memchr(options, recieved_char, sizeof(options))) {
                     opponents_selection = recieved_char;
@@ -249,10 +263,12 @@ void button_task ( __unused__ void *data )
         break;
 
     case STATE_SHOW_WINNER:
+        /* If navswitch push move to either initial or intro state */
         if ( navswitch_push_event_p ( NAVSWITCH_PUSH ) || button_push_event_p ( 0 ) )
         {
             mmelody_play (melody, select_sound);
             led_set  (LED1, 0);
+            /* If draw, returns to the introduction state */
             if (opponents_selection == your_selection)
             {
                 reset_game ();
@@ -260,6 +276,7 @@ void button_task ( __unused__ void *data )
                 state = STATE_INTRODUCTION;
             }
             else
+            /* If win or lose, returns to the initial state (resets) */
             {
                 reset_game ();
                 display_instructions_init (intro_message);
@@ -271,7 +288,7 @@ void button_task ( __unused__ void *data )
 }
 
 
-/** Main method (Where program thread starts. */
+/** Main method (Where program thread starts) */
 int main (void)
 {
     task_t tasks[] =
@@ -293,7 +310,6 @@ int main (void)
     display_instructions_init (intro_message);
     tweeter_task_init ();
     sound_task_init ();
-    /* Initialize Led */
     led_init ();
     led_set  (LED1, 0);
 
