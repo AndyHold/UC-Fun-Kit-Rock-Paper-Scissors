@@ -1,4 +1,7 @@
-Rock, paper, scissors game:
+Game: Rock, paper, scissors
+Author: A.Holden & R.Yoshinari 
+Date: 19/10/18
+Made for: UCFK4 (UC Funkit 4)
 
 Rock, paper, scissors game which can be played between the two microcontroller devices through infra-red communication.
 
@@ -12,7 +15,7 @@ Basic Instructions:
     Confirming / Moving to the next state - Pushing the navswitch.
     Choosing options - Navswitch directional actions North, East, South, West.
     Display - Messages and symbols will be displayed in the LED matrix horizontally.
-    Sound - Buzzer is plugged in to the microcontroller to enable sound throughout the game. 
+    Sound - Piezo buzzer is plugged in to the microcontroller to enable sound throughout the game. 
 
 It is split in the states of:
 
